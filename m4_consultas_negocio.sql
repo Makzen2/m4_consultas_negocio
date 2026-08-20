@@ -100,9 +100,9 @@ SELECT * FROM ventas;
 
 -- Consulta 1
 
-SElECT SUM(cantidad * precio_unitario) as [total facturado], 
-Sum(cantidad) as [total pedidos],
-SUM(cantidad * precio_unitario) / Sum(cantidad) as [ticket promedio],
+SELECT SUM(cantidad * precio_unitario) as [total facturado], 
+COUNT(id_venta) as [total pedidos],
+SUM(cantidad * precio_unitario) / COUNT(id_venta) as [ticket promedio],
 month(fecha_venta) as [mes]
 FROM ventas
 group by month(fecha_venta);
@@ -114,7 +114,7 @@ SELECT TOP 5
     SUM(cantidad * precio_unitario) AS [total facturado]
 FROM ventas
 GROUP BY id_producto
-ORDER BY [unidades vendidas] DESC;
+ORDER BY [total facturado] DESC;
 
 -- Consulta 3
 SELECT 
