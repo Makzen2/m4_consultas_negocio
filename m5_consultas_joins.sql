@@ -114,31 +114,32 @@ INNER JOIN categorias
 SELECT c.nombre, c.email, c.fecha_registro 
 FROM clientes c
 LEFT JOIN ventas v 
-     ON c.id_clientes = v.id_cliente
-     WHERE v.id_cliente IS NULL;
+ON c.id_clientes = v.id_cliente
+WHERE v.id_cliente IS NULL;
 
 --Consulta 3-- 
-SELECT p.nombre_producto, categorias.nombre_categoria as [categoria],v.precio_unitario as precio
+SELECT p.nombre_producto, categorias.nombre_categoria as [categoria],p.precio as precio
 FROM productos p
 LEFT JOIN ventas v
-    ON p.id_producto = v.id_producto
+ON p.id_producto = v.id_producto
 INNER JOIN categorias
-    ON p.id_categoria = categorias.id_categoria
-    WHERE v.id_producto IS NULL;
+ON p.id_categoria = categorias.id_categoria
+WHERE v.id_producto IS NULL;
 
 --Consulta 4--
-WITH total_por_canal AS (
-    SELECT 
-        'Online' AS canal,
-        (cantidad * precio_unitario) AS total_venta
+
+WITH ventas_unificadas as(
+
+     SELECT  fecha_venta AS fecha,(cantidad * precio_unitario) AS total,'Online' AS canal
+     FROM ventas
+     WHERE id_venta IS NOT NULL
+
+     UNION ALL
+ 
+    SELECT fecha_venta AS fecha,(cantidad * precio_unitario) AS total,'Presencial' AS canal
     FROM ventas
-    UNION ALL
-    SELECT 
-        'Presencial' AS canal,
-       (cantidad * precio_unitario) AS total_venta
-    FROM ventas)
-SELECT 
-    canal,
-    SUM(total_venta) AS total_general
-FROM total_por_canal
-GROUP BY canal;
+    WHERE id_venta IS NOT NULL)
+
+SELECT fecha,total, canal 
+FROM ventas_unificadas
+GROUP BY fecha, canal, total;
